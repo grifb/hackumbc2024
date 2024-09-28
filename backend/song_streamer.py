@@ -3,9 +3,19 @@ import os
 from queue import Queue
 
 
-def main(void):
-    print("Fuck you")
+class SongQueue:
+    def __init__(self, max_size = 100):
+        self.queue = []
+    
+    def add_song(self, song):
+        self.queue.append(song)
 
+    def play_song(self):
+        if not self.is_empty():
+            return self.queue.pop(0)
+        else:
+            return ""
 
-if __name__ == '__main__':
-    main();
+    def is_empty(self):
+        return len(self.queue) == 0
+
