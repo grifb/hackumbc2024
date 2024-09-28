@@ -1,6 +1,6 @@
 import subprocess
 import os
-import array
+from queue import Queue
 
 
 def main(void):
