@@ -34,5 +34,5 @@ async function getAccessToken() {
 }
 
 app.listen(port, () => {
-    console.log(`App listening on port http://localhost/${port}`);
+    console.log(`App listening on port http://localhost:${port}`);
 });
