@@ -14,8 +14,11 @@ class SongQueue:
         if not self.is_empty():
             return self.queue.pop(0)
         else:
-            return ""
+            return "Empty"
 
     def is_empty(self):
         return len(self.queue) == 0
+
+
+
 
