@@ -1,36 +1,44 @@
 import { Router } from 'express';
+import { spawn } from 'child_process';
 const router = Router();
 
-async function getAccessToken() {
-  // https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow
-  const response = await fetch(`https://accounts.spotify.com/api/token`, {
-      body: new URLSearchParams({
-          'grant_type': 'client_credentials'
-      }),
-      method: `POST`,
-      headers: {
-          'Authorization': 'Basic ' + (new Buffer.from(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')),
-          'Content-Type': 'application/x-www-form-urlencoded'
-      }
-  });
-  const parsed = await response.json();
-  return parsed["access_token"];
-}
-
-let accessToken = getAccessToken();
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.end('Hello world!');
 });
 
-router.get('/me',async function(req,res,next) {
-  const r = await fetch(`https://api.spotify.com/v1/me`,{
-  headers: {
-    'Authorization': `Bearer: ${accessToken}` 
-  }
-})
-const data = await r.json();
-res.end(data.email);
+router.post('/download-video', async function(req, res, next) {
+    if (!req.body.url)
+    {
+        res.status(400).end(`Url is missing!`);
+    }
+
+    const ytdlp = spawn('yt-dlp',
+    [
+        '-x',
+        '--audio-format', 'wav',
+        req.body.url
+    ]);
+
+
+    ytdlp.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    ytdlp.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    ytdlp.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+
+        if (code == 0) { 
+            res.end(`Queued up!`);
+        } else {
+            res.end(`An error occured while processing your video.`);
+        }
+    });
+
 });
 
 
