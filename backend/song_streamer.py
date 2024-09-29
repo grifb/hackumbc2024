@@ -3,7 +3,6 @@ import os
 from queue import Queue
 import time
 from pathlib import Path
-import playsound
 
 directory = "C:\\Users\\canna\\Downloads\\test\\"
 
