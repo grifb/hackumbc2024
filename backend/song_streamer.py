@@ -3,10 +3,15 @@ import os
 from pathlib import Path
 import wave
 import contextlib
+import time
 
 directory = "/home/asher/hackumbc2024/backend/songs/"
+startup = "/home/asher/hackumbc2024/backend/startup/"
 
 MPV_COMMAND = []
+
+
+
 
 class SongQueue:
     def __init__(self, max_size=100):
@@ -39,6 +44,7 @@ class SongQueue:
 
 
 def set_mpv_command():
+    global MPV_COMMAND
     if sub.check_output(["sudo bluetoothctl info 68:59:32:72:4D:25 | grep Connected"], shell=True, text=True).find("yes") == -1:
         print("Using audio jack...")
         MPV_COMMAND = [
@@ -65,6 +71,10 @@ def main():
 
     set_mpv_command()
 
+    sub.run(MPV_COMMAND + [f"{startup}startup.wav"])
+
+    time.sleep(2)
+
     for filename in os.scandir("/home/asher/hackumbc2024/backend/songs"):
         os.remove(filename)
 
@@ -76,7 +86,7 @@ def main():
             if queue.is_in(filename.name):
                 print("Waiting for song...")
                 continue
-            # If file type is a wav then add the song
+            #If file type is a wav then add the song
             elif Path(filename).suffix == '.wav':
                 queue.add_song(filename.name)
 
