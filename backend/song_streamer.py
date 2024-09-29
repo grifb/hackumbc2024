@@ -4,8 +4,9 @@ from pathlib import Path
 import wave
 import contextlib
 
-directory = "/home/user/hackumbc2024/backend/songs/"
+directory = "/home/asher/hackumbc2024/backend/songs/"
 
+MPV_COMMAND = []
 
 class SongQueue:
     def __init__(self, max_size=100):
@@ -19,11 +20,7 @@ class SongQueue:
     def play_song(self):
         if not self.is_empty():
             currentSong = self.queue.pop(0)
-            sub.run([
-                "mpv",
-                "--audio-device=alsa/bluealsa",
-                f"{directory}{currentSong}"
-            ])
+            sub.run(MPV_COMMAND + [f"{directory}{currentSong}"])
             return currentSong
         else:
             return "Empty"
@@ -41,6 +38,20 @@ class SongQueue:
         return self.queue[0]
 
 
+def set_mpv_command():
+    if sub.check_output(["sudo bluetoothctl info 68:59:32:72:4D:25 | grep Connected"], shell=True, text=True).find("yes") == -1:
+        print("Using audio jack...")
+        MPV_COMMAND = [
+                "mpv",
+                ]
+    else:
+        print("Using bluetooth")
+        MPV_COMMAND = [
+                "mpv",
+                "--audio-device=alsa/bluealsa",
+                ]
+
+
 def get_song_duration(file):
     with contextlib.closing(wave.open(file, 'r')) as f:
         frames = f.getnframes()
@@ -52,20 +63,26 @@ def get_song_duration(file):
 def main():
     os.system("bluetoothctl connect 68:59:32:72:4D:25")
 
+    set_mpv_command()
+
+    for filename in os.scandir("/home/asher/hackumbc2024/backend/songs"):
+        os.remove(filename)
+
     queue = SongQueue()
 
     # constantly checking for new files to add to queue
     while True:
         for filename in os.scandir(directory):
             if queue.is_in(filename.name):
+                print("Waiting for song...")
                 continue
-            elif Path(filename).suffix != '.wav':
+            # If file type is a wav then add the song
+            elif Path(filename).suffix == '.wav':
                 queue.add_song(filename.name)
 
         if queue.is_empty():
             continue
         else:
-            # ONLY RUN THIS PART RIGHT BEFORE PLAYING A NEW SONG
             currentSong = queue.play_song()
             # pops current file
             files = os.listdir(directory)

@@ -38,7 +38,7 @@ function App() {
     return (
         <div className="grid min-h-screen place-items-center">
         <div className="flex flex-col gap-8 min-w-[50%]">
-        <h1 className="font-sans-serif font-bold text-6xl">JamBase</h1>
+        <h1 className="font-sans-serif font-bold text-6xl">PiJam</h1>
         <input 
         onChange={(e) => setUrl(e.currentTarget.value)} 
         value={url} 

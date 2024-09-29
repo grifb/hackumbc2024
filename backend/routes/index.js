@@ -17,6 +17,7 @@ router.post('/download-video', async function(req, res, next) {
     [
         '-x',
         '--audio-format', 'wav',
+        '-P', 'songs/',
         req.body.url
     ]);
 
