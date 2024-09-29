@@ -54,7 +54,7 @@ while True:
     for file in files:
         if (Path(file.name) == currentSong):
             os.remove(os.path.join(directory,currentSong))
-        
+        #comment
     
 
 
